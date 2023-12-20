@@ -1,0 +1,289 @@
+[
+{
+  "model": "candles.security",
+  "pk": 1,
+  "fields": {
+    "engine": "stock",
+    "market": "shares",
+    "security": "YNDX"
+  }
+},
+{
+  "model": "candles.security",
+  "pk": 2,
+  "fields": {
+    "engine": "stock",
+    "market": "shares",
+    "security": "SBER"
+  }
+},
+{
+  "model": "candles.security",
+  "pk": 3,
+  "fields": {
+    "engine": "stock",
+    "market": "shares",
+    "security": "OZON"
+  }
+},
+{
+  "model": "candles.security",
+  "pk": 4,
+  "fields": {
+    "engine": "stock",
+    "market": "shares",
+    "security": "LKOH"
+  }
+},
+{
+  "model": "candles.security",
+  "pk": 5,
+  "fields": {
+    "engine": "currency",
+    "market": "selt",
+    "security": "USD000UTSTOM"
+  }
+},
+{
+  "model": "candles.security",
+  "pk": 6,
+  "fields": {
+    "engine": "currency",
+    "market": "selt",
+    "security": "GLDRUB_TOM"
+  }
+},
+{
+  "model": "candles.security",
+  "pk": 7,
+  "fields": {
+    "engine": "futures",
+    "market": "forts",
+    "security": "BRF4"
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 1,
+  "fields": {
+    "duration": "7 00:00:00",
+    "interval": 60
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 2,
+  "fields": {
+    "duration": "3 00:00:00",
+    "interval": 10
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 3,
+  "fields": {
+    "duration": "180 00:00:00",
+    "interval": 24
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 4,
+  "fields": {
+    "duration": "360 00:00:00",
+    "interval": 7
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 5,
+  "fields": {
+    "duration": "7 00:00:00",
+    "interval": 10
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 6,
+  "fields": {
+    "duration": "1000 00:00:00",
+    "interval": 31
+  }
+},
+{
+  "model": "candles.fetchsetting",
+  "pk": 7,
+  "fields": {
+    "duration": "360 00:00:00",
+    "interval": 24
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 1,
+  "fields": {
+    "security": 1,
+    "fetch_setting": 1,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 2,
+  "fields": {
+    "security": 2,
+    "fetch_setting": 2,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 3,
+  "fields": {
+    "security": 3,
+    "fetch_setting": 3,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 4,
+  "fields": {
+    "security": 4,
+    "fetch_setting": 4,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 5,
+  "fields": {
+    "security": 5,
+    "fetch_setting": 5,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 6,
+  "fields": {
+    "security": 6,
+    "fetch_setting": 6,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.fetcheddata",
+  "pk": 7,
+  "fields": {
+    "security": 7,
+    "fetch_setting": 7,
+    "data": null,
+    "data_update_dt": null,
+    "data_first_dt": null,
+    "data_last_dt": null,
+    "data_is_full": null
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 1,
+  "fields": {
+    "user": 1,
+    "fetched_data": 1,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 1
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 2,
+  "fields": {
+    "user": 1,
+    "fetched_data": 2,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 2
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 3,
+  "fields": {
+    "user": 1,
+    "fetched_data": 3,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 3
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 4,
+  "fields": {
+    "user": 1,
+    "fetched_data": 4,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 4
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "fetched_data": 5,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 5
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 6,
+  "fields": {
+    "user": 1,
+    "fetched_data": 6,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 6
+  }
+},
+{
+  "model": "candles.usersecurityfetchsetting",
+  "pk": 7,
+  "fields": {
+    "user": 1,
+    "fetched_data": 7,
+    "max_update_rate": "01:00:00",
+    "has_error": null,
+    "sequence_number": 7
+  }
+}
+]

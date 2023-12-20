@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Account Dashboard" %}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-center my-4">
+  <a href="{% url "account:edit" %}" class="btn btn-outline-primary px-3 mx-3">{% trans "Edit my profile" %}</a> 
+  <a href="{% url "account:password_change" %}" class="btn btn-outline-primary px-3 mx-3">{% trans "Change my password" %}</a>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Confirm delete" %}{% endblock %}
+
+{% block content %}
+<div class="container-sm m-5">
+  <h3>{% trans "Confirm bulk delete" %}</h3> 
+  <form method="post" action="{% url "candles:settingBulkDeleteConfirm" %}">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <ol class="list-group list-group-numbered">
+        {% for item in items %}
+        <input type="hidden" name="list-group-item" value="{{ item.id }}">
+        <li class="list-group-item d-flex flex-wrap">
+            <p class="mx-2">{{ item.fetched_data.security }}. {{ item.fetched_data.fetch_setting }}.</p>
+        </li>
+        {% endfor %}
+    </ol>
+    <div class="d-flex justify-content-around">
+        <button type="submit" class="btn btn-primary px-5 mt-3">{% trans "Confirm delete" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

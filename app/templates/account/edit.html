@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Edit my profile" %}{% endblock %}
+
+{% block content %}
+<div class="row my-4">
+  <div class="col-2"></div>
+  <div class="col-8">
+    <h3>{% trans "Edit my profile" %}</h3>
+    <form method="post" enctype="multipart/form-data">
+      {% crispy user_form %}
+      {% crispy profile_form %}
+      <button type="submit" class="btn btn-primary px-5 mt-2">{% trans "Save changes" %}</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

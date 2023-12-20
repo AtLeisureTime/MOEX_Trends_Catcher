@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block title %}{% trans "Securities tracking settings" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-1">
+    <!-- Show spinner on load -->
+    <div class="d-flex justify-content-center" id="spinner">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>    
+    <div id="charts-container"></div>
+</div>
+{% endblock %}
+
+{% block include_js %}
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script type="text/javascript" src="{% static "js/showCharts.js" %}"></script>
+<script type="text/javascript">
+    loadCharts("{% url "candles:candlesData" %}");
+</script>
+{% endblock %}

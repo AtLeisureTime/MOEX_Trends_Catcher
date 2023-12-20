@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Securities tracking settings" %}{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-2">
+    <div class="row justify-content-between mt-1">      
+        <div class="col-2"></div>
+        <div class="col-8">
+            {% if securitySettings %}
+                <div class="row me-1 mt-1">
+                    <div class="col-6 d-flex border border-2 rounded-2 border-light-subtle px-0">
+                        <div class="col-2 d-flex align-self-center justify-content-center px-1 py-1">
+                            <input type="checkbox" class="form-check-input" id="checkAll">          
+                        </div>
+                        <div class="col-10 d-flex align-self-center px-1 py-1">
+                            <small class="text-body-secondary">{% trans "Select all objects on this page" %}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url "candles:chooseAction" %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="next_next" value="{% url "candles:settingList" %}">
+                        <div id="sortable" class="ml-0 pl-0">              
+                            {% for securitySetting in securitySettings %}
+                                <div class="row border border-2 rounded-4 me-1 ml-0 pl-0 {% if securitySetting.has_error %}border-danger-subtle{% elif securitySetting.has_error is not None %}border-success-subtle{% else %}border-info-subtle{% endif %}">              
+                                    <div class="col-1 d-flex align-self-center justify-content-center deleteObject px-1 py-1">
+                                        <input type="checkbox" class="form-check-input" name="list-group-item" value="{{ securitySetting.id }}">
+                                    </div>
+                                    <div class="col-11 d-flex px-1 py-1">
+                                        <a href="{{ securitySetting.get_absolute_url }}" class="list-group-item list-group-item-action" aria-current="true">
+                                            {{ securitySetting.fetched_data.security }}<br>
+                                            {{ securitySetting.fetched_data.fetch_setting }}<br>
+                                            {% trans "Maximum candle refresh rate" %}: {{ securitySetting.max_update_rate }}
+                                        </a>
+                                    </div>                       
+                                    <input type="hidden" name="list-ordering-item" value="{{securitySetting.sequence_number}}">         
+                                </div>
+                            {% endfor %}
+                        </div>                   
+                    <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-outline-primary px-2 mt-2" name="delete" value="selected">{% trans "Delete selected objects" %}</button>
+                        <button type="submit" class="btn btn-outline-primary px-2 mt-2 ms-2" name="delete" value="all">{% trans "Delete all objects" %}</button>
+                        <button type="submit" class="btn btn-outline-primary px-2 mt-2 ms-2" name="setOrdering" value="set">{% trans "Save reordering" %}</button>
+                    </div>
+                </form>
+            {% endif %}
+
+            <div class="d-flex justify-content-around">
+                <a class="btn btn-outline-primary px-2 mt-2" href="{% url "candles:settingCreate" %}">{% trans "Add new security tracking" %}</a>
+            </div>
+        </div>
+        <div class="col-2"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block include_js %}
+<script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+<script>
+$( function() {
+    $( "#sortable" ).sortable();
+});
+
+$("#checkAll").click(function(){
+    $('.deleteObject input:checkbox').not(this).prop('checked', this.checked);
+});
+</script>
+{% endblock %}

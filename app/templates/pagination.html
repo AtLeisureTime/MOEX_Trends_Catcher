@@ -1,0 +1,37 @@
+{% load i18n %}
+
+<nav aria-label="page navigation" class="my-3">
+    {% if object_list %}
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a href="?page=1" class="page-link">1</a></li>
+        {% endif %}
+        {% if page_obj.previous_page_number != 1 %}
+            {% if page_obj.previous_page_number > 2 %}
+                <p class="mx-2">...</p>
+            {% endif %}
+            <li class="page-item">
+                <a href="?page={{ page_obj.previous_page_number }}" class="page-link">{{ page_obj.previous_page_number }}</a>
+            </li>
+        {% endif %}
+        <li class="page-item active">
+            <a href="#" class="page-link">{{ page_obj.number }}</a>
+        </li>
+        {% if page_obj.has_next %}        
+        <li class="page-item">
+            <a href="?page={{ page_obj.next_page_number }}" class="page-link">{{ page_obj.next_page_number }}</a>
+        </li>
+        {% endif %}
+        {% if page_obj.next_page_number != page_obj.paginator.num_pages %}
+            {% if page_obj.paginator.num_pages|add:'-1' > page_obj.next_page_number %}
+                <p class="mx-2">...</p>
+            {% endif %}
+            <li class="page-item">
+                <a href="?page={{ page_obj.paginator.num_pages }}" class="page-link">{{ page_obj.paginator.num_pages }}</a>
+            </li>
+        {% endif %}
+    </ul>
+    {% else %}
+    <p class="text-center my-2">{% trans "Such objects have not yet been created." %}</p>
+    {% endif %}
+  </nav>

@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Returns task results" %}{% endblock %}
+{% block content %}
+<div class="container mt-2 mx-2">
+    <p class=''>{% trans "Parameters of your request were" %}<br>{{taskParams}}</p>
+    {% if failed %}
+        <p class=''>{% trans "Your task has failed. Please click tab 'Returns' and create new task with other parameters." %}</p>
+    {% elif inProgress %}
+        <p class=''>{% trans "Your task is still in progress. Please click tab 'Returns' a bit later." %}</p>
+    {% else %}
+        {% if longReturns or shortReturns %}
+            <h5>{% trans "Best returns based on data downloaded to show candle charts for different users" %}</h5>
+        {% else  %}
+            <p class=''>{% blocktrans %}
+                There is no available fetched data for the entire range of parameter 'Duration'. 
+                Please create objects on tab 'Settigns of securities', click tab 'Candles' 
+                to fetch new data and then click tab 'Returns' to recreate your task.
+                {% endblocktrans %}</p>
+        {% endif %}
+        {% if longReturns %}
+            <table class="table table-striped table-bordered border border-3 align-middle text-center caption-top">
+                <caption>Best longs found</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Return per year without reinvesting, %</th>
+                        <th scope="col">Return per year with reinvesting, %</th>
+                        <th scope="col">Return per deal, %</th>
+                        <th scope="col">Security</th>
+                        <th scope="col">Buy time</th>
+                        <th scope="col">Buy price</th>
+                        <th scope="col">Sell time</th>
+                        <th scope="col">Sell price</th>
+                        <th scope="col">Data time period</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in longReturns %}
+                        <tr>
+                            {% for val in row %}
+                                <td>{{val}}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}        
+        {% if shortReturns %}
+            <table class="table table-striped table-bordered border border-3 align-middle text-center caption-top">
+                <caption>Best shorts found</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Return per year without reinvesting, %</th>
+                        <th scope="col">Return per year with reinvesting, %</th>
+                        <th scope="col">Return per deal, %</th>
+                        <th scope="col">Security</th>
+                        <th scope="col">Sell time</th>
+                        <th scope="col">Sell price</th>
+                        <th scope="col">Buy time</th>
+                        <th scope="col">Buy price</th>
+                        <th scope="col">Data time period</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in shortReturns %}
+                        <tr>
+                            {% for val in row %}
+                                <td>{{val}}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% trans "Create returns task" %}{% endblock %}
+
+{% block content %}
+<div class="row mt-4 mb-2">
+  <div class="col-2"></div>
+  <div class="col-8">
+    <h3>{% trans "Create a task to calculate best returns" %}</h3>
+    <form method="post">
+      {% crispy task_form %}
+      <input type="submit" value="{% trans "Create task" %}" class="btn btn-primary px-5 mt-2">
+    </form>
+  </div>
+</div>
+{% endblock %}

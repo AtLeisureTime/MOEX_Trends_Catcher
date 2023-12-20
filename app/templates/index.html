@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Home" %}{% endblock %}
+
+{% block content %}
+<div class="container m-2"></div>
+    <h4 class='text-center'>{% trans "MOEX Trends Catcher" %}</h4>
+    <div class="row mt-3">      
+        <div class="col-2"></div>
+        <div class="col-8">
+        {% blocktrans %}
+            <p>This app uses <a href="https://iss.moex.com/iss/reference/155">
+                /iss/engines/[engine]/markets/[market]/securities/[security]/candles</a>
+            endpoint of MOEX Informational Statistical Server to get OHLCV (open, high, low, close, volume) data 
+            for different securities. You need to know <em>engine</em>, <em>market</em> and <em>security</em> params 
+            to use this app.
+            <br><br>
+            All possible <em>engine</em> and <em>market</em> MOEX ISS names -  
+            <a href="https://iss.moex.com/iss/index">/iss/index</a>.
+            <br><br>
+            You can find <em>engine</em> and <em>market</em> parameters for your <em>security</em> using this request:<br>
+            <a href="https://iss.moex.com/iss/securities?q=">/iss/securities?q=</a>[security]<br>
+            E.g., the value of the column 'group' is 'stock_shares' for q=GAZP. Use stock as engine shares as market.
+            Other parameters of this end point - <a href="https://iss.moex.com/iss/reference/5">/iss/reference/5</a>.
+            </p>
+            <p>
+            <strong>After registration</strong> you can <em>add / update / delete / reorder settings</em> to fetch 
+            your favourite securities, look at its <em>candle charts</em> with tunable sizes and get info about 
+            best possible historical <em>long and short deals</em>. There's one limitation in this version of the app - 
+            you can fetch a maximum of only 500 last time intervals for a single security. But it's enough to catch current trend.
+            </p><p>
+            You can find more information about MOEX Informational Statistical Server and its RESTful API using this 
+            <a href="https://www.moex.com/a2193">link</a>.
+            </p>
+        {% endblocktrans %}
+        </div>
+    </div>
+</div>
+{% endblock %}
