@@ -47,6 +47,9 @@ All OHLC data for calculations are loaded only from database, filtered based on 
 * bootstrap5, echarts, jquery - for UI
 
 
+## Demo video
+https://github.com/AtLeisureTime/MOEX_Trends_Catcher/assets/16018457/ac8502d4-e3cc-4bf1-bc3b-016f26faf3d5
+
 ## Run
 
 ### Requirements
