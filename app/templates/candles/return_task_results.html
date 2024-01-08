@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
-
+{% load my_tags %}
 {% block title %}{% trans "Returns task results" %}{% endblock %}
 {% block content %}
 <div class="container mt-2 mx-2">
@@ -20,59 +20,68 @@
                 {% endblocktrans %}</p>
         {% endif %}
         {% if longReturns %}
-            <table class="table table-striped table-bordered border border-3 align-middle text-center caption-top">
-                <caption>Best longs found</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Return per year without reinvesting, %</th>
-                        <th scope="col">Return per year with reinvesting, %</th>
-                        <th scope="col">Return per deal, %</th>
-                        <th scope="col">Security</th>
-                        <th scope="col">Buy time</th>
-                        <th scope="col">Buy price</th>
-                        <th scope="col">Sell time</th>
-                        <th scope="col">Sell price</th>
-                        <th scope="col">Data time period</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in longReturns %}
-                        <tr>
-                            {% for val in row %}
-                                <td>{{val}}</td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}        
+            {% include "candles/result_table.html" with returns=longReturns tableLabel='longs' chartIds=longIds%}
+        {% endif %}
         {% if shortReturns %}
-            <table class="table table-striped table-bordered border border-3 align-middle text-center caption-top">
-                <caption>Best shorts found</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Return per year without reinvesting, %</th>
-                        <th scope="col">Return per year with reinvesting, %</th>
-                        <th scope="col">Return per deal, %</th>
-                        <th scope="col">Security</th>
-                        <th scope="col">Sell time</th>
-                        <th scope="col">Sell price</th>
-                        <th scope="col">Buy time</th>
-                        <th scope="col">Buy price</th>
-                        <th scope="col">Data time period</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in shortReturns %}
-                        <tr>
-                            {% for val in row %}
-                                <td>{{val}}</td>
-                            {% endfor %}
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            <br>
+            {% include "candles/result_table.html" with returns=shortReturns tableLabel='shorts' chartIds=shortIds%}
         {% endif %}
     {% endif %}
 </div>
+{% endblock %}
+
+{% block include_js %}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+
+<script type="text/javascript">
+    const COL_CHART_ID = 0;
+    const COL_RETURN_PER_DEAL = 3;
+    const COL_SECURITY = 4;
+
+    function setAllChartsLink(table, tableSelector) {
+        let allLinks = table.columns(COL_CHART_ID).data().eq(0).toArray();
+        selector = tableSelector + ' > thead > tr > th > #allChartsUrl';
+        let link = document.querySelector(selector).href;
+        link = link.split('?ids=')[0] + '?ids=' + allLinks.join();
+        document.querySelector(selector).href = link;
+    }
+
+    function changePageChartLinks(selector, column) {
+        let rows = document.querySelector(selector).getElementsByTagName('tr');
+        for (let i = 0; i < rows.length; i++) {
+            let link = rows[i].getElementsByTagName('td')[column].querySelector('a').href;
+            link = link.split('?ids=')[0] + '?ids=' + rows[i].getElementsByTagName('td')[0].innerText;
+        }
+    }
+
+    function toDataTable(tableSelector, orderingInd) {
+        const lengthMenu = [
+            [10, 5, 3, 20, 50, -1],
+            [10, 5, 3, 20, 50, 'All']
+        ];
+        const dom = '<"d-flex justify-content-between my-2"lf>tip'
+
+        if (!document.querySelector(tableSelector)) {
+            return;
+        }
+
+        let table = new DataTable(tableSelector, {
+            lengthMenu: lengthMenu,
+            dom: dom,
+            order: [[+orderingInd + 1, 'desc']]
+        });
+
+        setAllChartsLink(table, tableSelector);
+
+        table.on('order.dt', function (e, settings, ordArr) {
+            changePageChartLinks(tableSelector + ' > tbody', COL_SECURITY);
+            setAllChartsLink(table, tableSelector);
+        });
+    }
+
+    toDataTable('#longs', '{{ orderingInd }}');
+    toDataTable('#shorts', '{{ orderingInd }}');
+</script>
 {% endblock %}

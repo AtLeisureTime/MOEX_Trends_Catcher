@@ -1,0 +1,55 @@
+{% load i18n %}
+{% load my_tags %}
+
+<table id="{{ tableLabel }}" class="table table-striped table-bordered border border-3 align-middle text-center caption-top">
+    <thead class="sticky-top">
+        <tr>
+            <th scope="col" hidden>Chart id</th>
+            <th scope="col">Return per year without reinvesting, %</th>
+            <th scope="col">Return per year with reinvesting, %</th>
+            <div class="container"><th scope="col">Return per deal, %</th></div>
+            <th scope="col">Security</th>
+            <th scope="col">Buy time</th>
+            <th scope="col">Buy price</th>
+            <th scope="col">Sell time</th>
+            <th scope="col">Sell price</th>
+            <th scope="col">Data time period</th>
+            <th scope="col">Sharpe ratio</th>
+            <th scope="col">Sortino ratio</th>
+            <th scope="col">Max drawdown</th>
+            <th scope="col">Calmar ratio</th>
+            <th scope="col">Standard deviation</th>
+            <th scope="col">Alpha</th>
+            <th scope="col">Beta</th>
+            <th scope="col">Treynor ratio</th>
+            <th scope="col">R squared 1</th>
+            <th scope="col">R squared 2</th>
+            <th scope="col">Information ratio</th>
+        </tr>
+        <tr><th colspan="21" class="text-body-secondary border">
+            Best {{ tableLabel }} found - <a href="{% url "candles:list" %}" id="allChartsUrl">all charts</a>
+        </th></tr>
+    </thead>
+    <tbody>                    
+        {% for row in returns %}
+            <tr>
+                {% for val in row %}
+                    {% if forloop.counter == 1 %}                                    
+                        {% with i=forloop.parentloop.counter|add:"-1" %}
+                            <td hidden>{{ chartIds|index:i }}</td>
+                        {% endwith %}                                    
+                    {% endif %}
+                    {% if forloop.counter == 4 %}
+                        <td>
+                            {% with i=forloop.parentloop.counter|add:"-1" %}
+                                <a href="{% url "candles:list" %}?ids={{ chartIds|index:i }}">{{val}}</a>
+                            {% endwith %}
+                        </td>
+                    {% else %}
+                        <td>{{val}}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

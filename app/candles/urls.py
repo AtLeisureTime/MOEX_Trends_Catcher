@@ -12,6 +12,8 @@ urlpatterns = [
     dj_urls.path('trackingSettings/', views.SecuritySettingListView.as_view(), name='settingList'),
     dj_urls.path('trackingSettings/add/',
                  views.createSecuritySetting, name='settingCreate'),
+    dj_urls.path('trackingSettings/addTopByCapStocks/',
+                 views.addStocksTopByCap, name='addTopByCapStocks'),
     dj_urls.path('trackingSettings/chooseAction/', views.chooseAction, name='chooseAction'),
     dj_urls.path('trackingSettings/bulkDeleteConfirm/',
                  views.bulkDeleteConfirm, name='settingBulkDeleteConfirm'),

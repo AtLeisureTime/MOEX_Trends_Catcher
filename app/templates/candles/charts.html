@@ -1,15 +1,15 @@
 {% if objects %}
     <div class="d-flex justify-content-between px-1">
         <label for="chartWidthRange" class="form-label px-1">Width</label>
-        <input type="range" class="form-range" min="200" max="1500" value="600" id="chartWidthRange">
+        <input type="range" class="form-range" min="200" max="1500" value="730" id="chartWidthRange">
         <label for="chartHeightRange" class="form-label px-1 ms-3">Height</label>
-        <input type="range" class="form-range" min="200" max="1500" value="500" id="chartHeightRange">
+        <input type="range" class="form-range" min="200" max="1500" value="680" id="chartHeightRange">
     </div>
 {% endif %}
 <div class="row justify-content-center mt-1" id="charts">
     {% if objects %}
         {% for obj in objects %}
-            <div id="chart-{{ forloop.counter }}" class="mb-3" style="width:600px;height:500px;"></div>
+            <div id="chart-{{ forloop.counter }}" class="mb-3" style="width:730px;height:680px;"></div>
         {% endfor %}
     {% endif %}
     {% include "pagination.html" with object_list=objects %}

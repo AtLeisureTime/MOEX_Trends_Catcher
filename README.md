@@ -30,10 +30,11 @@ There's one limitation in this version of the app - you can fetch a maximum of o
 Charts for securities with tunable sizes. An order of securities in charts is determined by order of security settings in *Settings of securities* tab.
 5. **Returns** (for authenticated users)<br>
 5.1. **The form for creation of background celery task** to find best long and short deal returns on historical data for all securities loaded by all users.<br>
-Parameters of task are duration of time series, different types of fees in percentages, what type of return to use for results sorting (return per deal in percentages or return recalculated as a percentage per annum), what data to use from every interval (Open-Close or High-Low).<br>
+Parameters of task are duration of time series, different types of fees in percentages, risk free return (a percentage per annum), what type of return to use for results sorting (return per deal in percentages or return recalculated as a percentage per annum), what data to use from every interval (Open-Close or High-Low).<br>
 When High-Low is choosed, High-Low data are extracted for long deal calculations and *Low-High* data are extracted for short deals because we don't know what value was in the interval the first, High or Low, therefore the worst case is considered.<br>
 5.2. **Results of finished task** in 2 tables in sorted by return order.<br>
 All OHLC data for calculations are loaded only from database, filtered based on *duration* param of task form and ordered by last datetime of security data in descending order. No more than one table row is issued for each security.
+Risk-adjusted performance measures are calculated for every security in the results table.
 
 
 ## Tech stack
@@ -44,7 +45,7 @@ All OHLC data for calculations are loaded only from database, filtered based on 
 * Celery, Redis, RabbitMQ - for background celery task
 * Docker - for postgres, redis, rabbitmq services
 * crispy_forms, crispy-bootstrap5 - for forms in templates
-* bootstrap5, echarts, jquery - for UI
+* bootstrap5, echarts, jquery, datatables - for UI
 
 
 ## Demo video

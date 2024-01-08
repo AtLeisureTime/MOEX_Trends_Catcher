@@ -214,9 +214,9 @@ function loadCharts(url) {
 function setChartSize(charts, drawnCharts) {
     const widthSlider = document.getElementById('chartWidthRange');
     const heightSlider = document.getElementById('chartHeightRange');
-    widthSlider.min = Math.round(window.screen.width/12);
+    widthSlider.min = Math.round(window.screen.width / 12);
     widthSlider.max = Math.round(window.screen.width * 0.93);
-    heightSlider.min = Math.round(window.screen.height/12);
+    heightSlider.min = Math.round(window.screen.height / 3);
     heightSlider.max = window.screen.height;
     
 

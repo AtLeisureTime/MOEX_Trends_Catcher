@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from account import models as account_models
-from . import const
+from . import const, download
 
 User = account_models.CustomUser
 
@@ -132,6 +132,48 @@ class UserSecurityFetchSetting(models.Model):
 
     def get_absolute_url(self) -> str:
         return reverse('candles:settingUpdate', args=[self.id])
+
+    @classmethod
+    def addStocksNumTopCap(cls, user: User, numTop: int) -> bool:
+        """ Create 'numTop' UserSecurityFetchSetting objects for 'user'.
+        Args:
+            user (User): stocks observer
+            numTop (int): number of top stocks by capitalization to add
+        Returns:
+            bool: is operation successful
+        """
+        DURATION, INTERVAL, MAX_UPDATE_RATE = datetime.timedelta(days=1000), \
+            FetchSetting.Intervals.I_1DAY, datetime.timedelta(days=1)
+
+        securityTickers, capitalizatns, __ = download.MOEX_Ticker_Downloader.fetchSecurities(
+            [const.MOEX_SECURITY_LIST_URL], timeoutSec=30)
+        if securityTickers is None or capitalizatns is None:
+            return False
+        res = zip(securityTickers, capitalizatns)
+        res = filter(lambda row: row[1], res)
+        res = sorted(res, key=lambda row: row[1], reverse=True)
+        maxSeqNum = cls.objects.filter(user=user)\
+            .aggregate(maxSeqNum=models.Max('sequence_number')).get('maxSeqNum') or 0
+        settingsToUpd = []
+        for secId, __ in res[:numTop]:
+            security, __ = Security.objects.get_or_create(
+                engine='stock', market='shares', security=secId)
+            fetch_setting, __ = FetchSetting.objects.get_or_create(
+                duration=DURATION, interval=INTERVAL)
+            fetched_data, __ = FetchedData.objects.only('security', 'fetch_setting')\
+                .get_or_create(security=security, fetch_setting=fetch_setting)
+
+            try:
+                setting = cls.objects.get(user=user, fetched_data=fetched_data)
+            except cls.DoesNotExist:
+                setting = cls.objects.create(user=user, fetched_data=fetched_data,
+                                             sequence_number=maxSeqNum + 1)
+                maxSeqNum += 1
+            setting.max_update_rate = MAX_UPDATE_RATE
+            setting.has_error = None
+            settingsToUpd.append(setting)
+        cls.objects.bulk_update(settingsToUpd, ['max_update_rate', 'has_error'])
+        return True
 
 
 class CandlesUpdate(models.Model):

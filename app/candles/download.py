@@ -66,6 +66,8 @@ class BaseDownloader:
             error = cls._validateResp(res, *args, **kwargs)
         if error is None:
             res = cls._transformResp(res, *args, **kwargs)
+        else:
+            res = None
         return res, status, error
 
     @classmethod
@@ -116,7 +118,7 @@ class MOEX_Downloader(BaseDownloader):
         if not respJson['candles']['columns'] or \
             not isinstance(respJson['candles']['columns'], list) or \
                 respJson['candles']['columns'] != const.MOEX_COLS:
-            return _('Order of columns has changed to {cols}').format(const.MOEX_COLS)
+            return _('Order of columns has changed in response.')
         if not respJson['candles']['data'] or not isinstance(respJson['candles']['data'], list):
             return _('No data.')
         if not isinstance(respJson['candles']['data'][0], list) or \
@@ -196,3 +198,99 @@ class MOEX_Downloader(BaseDownloader):
         errRespUrls = [pageUrlsToGet[i] for i in errRespInd]
 
         return dataArrs, statuses, errors, errRespUrls, beginDts, endDts, isFulls
+
+
+class MOEX_Ticker_Downloader(BaseDownloader):
+
+    @classmethod
+    def _validateResp(cls, respJson: dict, *args: typing.Any, **kwargs: typing.Any) -> str | None:
+        """ Validates json response content and returns error message.
+        Args:
+            respJson (dict): GET URL response json
+            args (tuple): positional arguments
+            kwargs (dict): keyword arguments
+        Returns:
+            str | None: error message
+        """
+        SCR, MRKD = 'securities', 'marketdata'
+        if SCR not in respJson or MRKD not in respJson:
+            return _("No 'securities' or / and 'marketdata' field in response.")
+        if 'error' in respJson[SCR] or 'error' in respJson[MRKD]:
+            return respJson[SCR].get('error', None) or \
+                respJson[MRKD].get('error', None) or _("There's 'error' field in response.")
+        if 'columns' not in respJson[SCR] or 'columns' not in respJson[MRKD]\
+                or 'data' not in respJson[SCR] or 'data' not in respJson[MRKD]:
+            return _("No 'columns' or / and 'data' fields inside 'securities' or / and "
+                     "'marketdata' fields in response.")
+        if not respJson[SCR]['columns'] or not respJson[MRKD]['columns']\
+            or not isinstance(respJson[SCR]['columns'], list) \
+                or not isinstance(respJson[MRKD]['columns'], list)\
+            or respJson[SCR]['columns'] != const.MOEX_SECURITY_COLS\
+                or respJson[MRKD]['columns'] != const.MOEX_MARKETDATA_COLS:
+            return _('Order of columns has changed in response.')
+        if not respJson[SCR]['data'] or not respJson[MRKD]['data']\
+                or not isinstance(respJson[SCR]['data'], list)\
+        or not isinstance(respJson[MRKD]['data'], list):
+            return _("No 'data' field in response.")
+        if not isinstance(respJson[SCR]['data'][0], list)\
+            or not isinstance(respJson[MRKD]['data'][0], list)\
+                or not isinstance(respJson[SCR]['data'][0][0], str)\
+            or not isinstance(respJson[MRKD]['data'][0][0], int | float):
+            return _('Data format has changed.')
+
+    @classmethod
+    def _transformResp(cls, respJson: dict, *args: typing.Any, **kwargs: typing.Any)\
+            -> tuple[list[str], list[int | float]]:
+        """ Extracts 'securities'>'data'>'SECID' and 'marketdata'>'data'>'ISSUECAPITALIZATION'
+            fields from respJson.
+        Args:
+            respJson (dict): GET URL response json
+            args (tuple): positional arguments
+            kwargs (dict): keyword arguments
+        Returns:
+            tuple[list[str], list[int | float]]: tickers of securities, security capitalizations
+            Lengthes of lists are the same.
+        """
+        securityTickers = [row[0] for row in respJson['securities']['data']]
+        capitalizatns = [row[0] for row in respJson['marketdata']['data']]
+        return securityTickers, capitalizatns
+
+    @classmethod
+    def fetchSecurities(cls, pageUrlsToGet: list[str], timeoutSec: int | float)\
+            -> tuple[list[str], list[int | float], list[str]]:
+        """ Downloads data for every URL in 'pageUrlsToGet', validates its json,
+            extracts security tickers and their capitalizations.
+        Args:
+            pageUrlsToGet (list[str]): urls for GET URL requests
+            timeoutSec (int | float): maximum waiting time
+        Returns:
+            tuple[list[str], list[int | float], list[str]]:
+            tickers of securities, security capitalizations, erroneous responses URL list
+            Lengthes of lists are the same.
+        """
+        if not pageUrlsToGet:
+            return
+
+        start = time.time()
+        results = asyncio.run(super().fetchMany(pageUrlsToGet, timeoutSec))
+        end = time.time()
+        logger.debug(f"Fetch time of {len(pageUrlsToGet)} urls is {end - start}.")
+        results, statuses, errors = zip(*results) if results else ([], [], [])
+
+        resultsCleaned = []
+        for res in results:
+            if res is None:
+                resultsCleaned.append((None, None))
+            else:
+                resultsCleaned.append(res)
+
+        if not resultsCleaned:
+            securityTickers, capitalizatns = ([], [])
+        else:
+            securityTickers, capitalizatns = zip(*resultsCleaned)
+
+        errRespInd = [i for i in range(len(pageUrlsToGet))
+                      if not statuses[i] or statuses[i] >= 400 or errors[i]]
+        errRespUrls = [pageUrlsToGet[i] for i in errRespInd]
+
+        return securityTickers[0], capitalizatns[0], errRespUrls

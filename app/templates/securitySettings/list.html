@@ -48,8 +48,12 @@
                 </form>
             {% endif %}
 
-            <div class="d-flex justify-content-around">
+            <div class="d-flex justify-content-center">
                 <a class="btn btn-outline-primary px-2 mt-2" href="{% url "candles:settingCreate" %}">{% trans "Add new security tracking" %}</a>
+                <form method="post" action="{% url "candles:addTopByCapStocks" %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-primary px-2 mt-2 ms-2">{% trans "Add top 150 stocks by capitalization" %}</button>
+                </form>
             </div>
         </div>
         <div class="col-2"></div>
@@ -61,12 +65,12 @@
 <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
 <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 <script>
-$( function() {
-    $( "#sortable" ).sortable();
-});
+    $( function() {
+        $( "#sortable" ).sortable();
+    });
 
-$("#checkAll").click(function(){
-    $('.deleteObject input:checkbox').not(this).prop('checked', this.checked);
-});
+    $("#checkAll").click(function(){
+        $('.deleteObject input:checkbox').not(this).prop('checked', this.checked);
+    });
 </script>
 {% endblock %}

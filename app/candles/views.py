@@ -1,4 +1,5 @@
 """ Views for tabs 'Settings of securities', 'Candles', 'Returns'."""
+import datetime
 import logging
 from typing import Any
 import celery.result
@@ -239,14 +240,12 @@ def bulkDelete(request: HttpRequest) -> HttpResponse:
 def setOrdering(request: HttpRequest) -> HttpResponse:
     """ View for setting ordering of model objects."""
     model = models.UserSecurityFetchSetting
-    templateName = 'securitySettings/list.html'
     itemName = 'list-ordering-item'
-    MENU_SECTION = MENU_SECTION_SETTINGS
 
     if request.method == POST:
 
-        setOrdering = request.POST.get('setOrdering', None)
-        if not setOrdering or setOrdering != 'set':
+        setOrderingInp = request.POST.get('setOrdering', None)
+        if not setOrderingInp or setOrderingInp != 'set':
             return HttpResponseBadRequest()
 
         seqNums = request.POST.getlist(itemName)
@@ -260,11 +259,8 @@ def setOrdering(request: HttpRequest) -> HttpResponse:
             if newVal:
                 item.sequence_number = newVal
         model.objects.bulk_update(items, ['sequence_number'])
-        items = items.order_by('sequence_number')
-        items = items.prefetch_related(models.FetchedData.getPrefetchObjWoDataFields())
 
-        return render(request, templateName,
-                      {'securitySettings': items, 'section': MENU_SECTION})
+        return HttpResponseRedirect(reverse_lazy('candles:settingList'))
 
     return HttpResponseBadRequest()
 
@@ -289,25 +285,62 @@ def bulkDeleteConfirm(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
+def addStocksTopByCap(request: HttpRequest) -> HttpResponse:
+    """ View to add N top stocks by capitalization."""
+    NUM_TOP_CAPITALIZATN_STOCKS = 150
+
+    if request.method == POST:
+        wereAdded = models.UserSecurityFetchSetting.addStocksNumTopCap(
+            user=request.user, numTop=NUM_TOP_CAPITALIZATN_STOCKS)
+        if wereAdded:
+            dj_messages.success(request, Messages.ADD_SUCCESS)
+        else:
+            dj_messages.error(request, Messages.ADD_ERROR)
+        return HttpResponseRedirect(reverse_lazy('candles:settingList'))
+
+    return HttpResponseBadRequest()
+
+
+@login_required
 def getCandlesPreview(request: HttpRequest) -> HttpResponse:
     """ View with base candle template without OHLCV data and charts."""
     template_name = 'candles/list.html'
     MENU_SECTION = 'candles'
 
-    return render(request, template_name,
-                  {'section': MENU_SECTION})
+    return render(request, template_name, {'section': MENU_SECTION})
 
 
 @login_required
 def getCandles(request: HttpRequest) -> HttpResponse:
     """ View to load OHLCV data load from DB and fetch too old data from MOEX."""
     template_name = 'candles/charts.html'
-    numObjsPerPage = 10
-    MENU_SECTION = 'candles'
+    numObjsPerPage = 50
     FETCH_TIMEOUT = 300
 
     objs = models.UserSecurityFetchSetting.objects.filter(
         user=request.user).order_by('sequence_number')
+
+    ids = request.GET.get('ids')
+    if ids:
+        # load objs from DB with specified fetched_data 'ids'
+
+        ids = [int(id_) for id_ in ids.split(',')]
+        preserved = dj_models.Case(*[dj_models.When(fetched_data_id=id_, then=position)
+                                     for position, id_ in enumerate(ids)])
+        objs = objs.select_related('fetched_data__security').filter(fetched_data_id__in=ids)\
+            .order_by(preserved)
+
+        paginator = Paginator(objs, numObjsPerPage)
+        pageNum = request.GET.get('page')
+        page = paginator.get_page(pageNum)
+        pageObjs = page.object_list
+
+        results = [obj.fetched_data.data for obj in pageObjs]
+        securities = [obj.fetched_data.security.security for obj in pageObjs]
+
+        return JsonResponse({'html': render_to_string(
+            template_name, {'objects': range(len(results)), 'page_obj': page}, request),
+            'jsonObjects': results, 'titles': securities})
 
     paginator = Paginator(objs, numObjsPerPage)
     pageNum = request.GET.get('page')
@@ -380,7 +413,7 @@ def returnsTask(request: HttpRequest) -> HttpResponse:
     template_name_create = 'candles/return_task_create.html'
     template_name_results = 'candles/return_task_results.html'
     MENU_SECTION = 'returns'
-    NUM_BEST_RETURNS = 10  # max number of rows in template tables
+    REDIS_RESULT_EXPIRES = datetime.timedelta(hours=6)  # it should be < CELERY_RESULT_EXPIRES
 
     celeryTasks = redisApp.hgetall(f'users:{request.user.id}:returnTasks')
     if celeryTasks:
@@ -395,12 +428,13 @@ def returnsTask(request: HttpRequest) -> HttpResponse:
                            'taskParams': taskParams, 'longReturns': [], 'shortReturns': []})
 
         if taskState == celery.states.SUCCESS:
-            longReturns, shortReturns = asyncResult.get()
+            longReturns, shortReturns, longIds, shortIds, orderingInd = asyncResult.get()
             redisApp.hdel(f'users:{request.user.id}:returnTasks', taskId)
             return render(request, template_name_results,
                           {'section': MENU_SECTION, 'taskParams': taskParams,
                            'failed': False, 'inProgress': False,
-                           'longReturns': longReturns, 'shortReturns': shortReturns})
+                           'longReturns': longReturns, 'shortReturns': shortReturns,
+                           'longIds': longIds, 'shortIds': shortIds, 'orderingInd': orderingInd})
 
         # state is in {PENDING, RECEIVED, RETRY, STARTED}
         return render(request, template_name_results,
@@ -412,11 +446,11 @@ def returnsTask(request: HttpRequest) -> HttpResponse:
         if taskForm.is_valid():
             cd = taskForm.cleaned_data
             cd['duration'] = int(cd['duration'].total_seconds())
-            asyncResult = tasks.findBestReturnsForAllSecurities.apply_async(
-                args=(cd, NUM_BEST_RETURNS))
+            asyncResult = tasks.findBestReturnsForAllSecurities.apply_async(args=(cd,))
             taskParams = taskForm.cleanedDataAsStr()
             redisApp.hset(f'users:{request.user.id}:returnTasks',
                           mapping={asyncResult.task_id: taskParams})
+            redisApp.expire(f'users:{request.user.id}:returnTasks', REDIS_RESULT_EXPIRES)
             dj_messages.success(request, Messages.CREATE_TASK_SUCCESS)
             return render(request, template_name_results,
                           {'section': MENU_SECTION, 'failed': False, 'inProgress': True,
