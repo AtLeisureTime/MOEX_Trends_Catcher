@@ -1,7 +1,7 @@
 # MOEX Trends Catcher
 ## Preface
 This app uses [/iss/engines/[engine_name]/markets/[market_name]/securities/[security_name]/candles](https://iss.moex.com/iss/reference/155)
-endpoint of MOEX Informational Statistical Server to get OHLCV (open, high, low, close, volume) data for different securities. You need to know **engine**, **market** and **security** params to use this app.
+endpoint of MOEX Informational Statistical Server to get OHLCV (open, high, low, close, volume) data for different securities. You need to know **engine**, **market** and **security** params to use this app (or you can just click "Add top 150 stocks by capitalization" button :smiley:).
 
 All possible *engine* and *market* MOEX ISS names - [/iss/index](https://iss.moex.com/iss/index)
 
@@ -33,7 +33,7 @@ Charts for securities with tunable sizes. An order of securities in charts is de
 Parameters of task are duration of time series, different types of fees in percentages, risk free return (a percentage per annum), what type of return to use for results sorting (return per deal in percentages or return recalculated as a percentage per annum), what data to use from every interval (Open-Close or High-Low).<br>
 When High-Low is choosed, High-Low data are extracted for long deal calculations and *Low-High* data are extracted for short deals because we don't know what value was in the interval the first, High or Low, therefore the worst case is considered.<br>
 5.2. **Results of finished task** in 2 tables in sorted by return order.<br>
-All OHLC data for calculations are loaded only from database, filtered based on *duration* param of task form and ordered by last datetime of security data in descending order. No more than one table row is issued for each security.
+All OHLC data for calculations are loaded only from database, filtered based on *duration* param of task form and ordered by last datetime of security data in descending order. No more than one table row is issued for each security.<br>
 Risk-adjusted performance measures are calculated for every security in the results table.
 
 
@@ -49,6 +49,10 @@ Risk-adjusted performance measures are calculated for every security in the resu
 
 
 ## Demo video
+v 0.1
+https://github.com/AtLeisureTime/MOEX_Trends_Catcher/assets/16018457/1b78d549-4caf-48d2-a52a-3a094f2658a1
+
+v 0.0
 https://github.com/AtLeisureTime/MOEX_Trends_Catcher/assets/16018457/ac8502d4-e3cc-4bf1-bc3b-016f26faf3d5
 
 ## Run
