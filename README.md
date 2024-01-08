@@ -49,11 +49,14 @@ Risk-adjusted performance measures are calculated for every security in the resu
 
 
 ## Demo video
-v 0.1
+Version 0.1 - "Settings of securities", "Candles", "Returns" tabs
+
 https://github.com/AtLeisureTime/MOEX_Trends_Catcher/assets/16018457/1b78d549-4caf-48d2-a52a-3a094f2658a1
 
-v 0.0
+Version 0.0 - all tabs
+
 https://github.com/AtLeisureTime/MOEX_Trends_Catcher/assets/16018457/ac8502d4-e3cc-4bf1-bc3b-016f26faf3d5
+
 
 ## Run
 
